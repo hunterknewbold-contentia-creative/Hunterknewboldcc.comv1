@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About | Portfolio, Writing, and Narrative Consistency | Hunter Knewbold</title>
+  <meta name="description" content="Learn about Hunter Knewbold’s background in web design, content systems, behavioral design, and brand narrative.">
+  <meta name="theme-color" content="#0a0a08">
+  <meta name="robots" content="index,follow">
+  <meta property="og:title" content="About Hunter Knewbold | Portfolio, Writing, and Narrative Consistency">
+  <meta property="og:description" content="Learn about Hunter Knewbold’s background in web design, content systems, behavioral design, and brand narrative.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://hunterknewboldcc.com/about/">
+  <meta property="og:site_name" content="Hunter Knewbold">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="About Hunter Knewbold | Portfolio, Writing, and Narrative Consistency">
+  <meta name="twitter:description" content="Learn about Hunter Knewbold’s background in web design, content systems, behavioral design, and brand narrative.">
+  <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+  <link rel="canonical" href="https://hunterknewboldcc.com/about/">
+  <link rel="stylesheet" href="/assets/css/design-tokens.css">
+  <link rel="stylesheet" href="/assets/css/dossier-base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <link rel="stylesheet" href="/assets/css/layout.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;500;600&family=Rajdhani:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Person", "name": "Hunter Knewbold", "url": "https://hunterknewboldcc.com", "jobTitle": "Web Designer and Content Creator", "description": "Learn about Hunter Knewbold’s background in web design, content systems, behavioral design, and brand narrative.", "knowsAbout": ["web design", "content strategy", "behavioral design", "systems thinking", "writing"], "email": "hunterknewbold@hunterknewboldcc.com", "sameAs": ["https://instagram.com/hunterknewbold", "https://x.com/HunterNewb92822"]}</script>
+</head>
+<body>
+<div class="read-progress"></div>
+<header class="site-header">
+  <div class="page-shell nav-row">
+    <a class="nav-logo" href="/">Hunter Knewbold</a>
+    <ul class="nav-links"><li><a data-nav href="/">Root Terminal</a></li><li><a data-nav href="/about/">Operator Profile</a></li><li><a data-nav href="/portfolio/">Field Operations</a></li><li><a data-nav href="/blog/">Intel Logs</a></li><li><a data-nav href="/contact/">Secure Uplink</a></li></ul>
+  </div>
+</header>
+
+<main class="page-shell">
+  <div class="classification-banner">
+    <div class="classification-badge">Operator Profile</div>
+    <div class="classification-meta">About Hunter Knewbold — web designer, content creator, systems thinker, and long-form writer.</div>
+  </div>
+
+  <section class="hero-shell">
+    <div class="content-shell">
+      <div class="kicker">PROFILE / SYSTEMS / VOICE</div>
+      <h1 class="page-title">I build with <em>clarity, structure, and narrative consistency</em>.</h1>
+      <p class="lede">I’m Hunter Knewbold, a web designer and content creator. My work blends visual systems, writing, and behavioral thinking so websites feel coherent, memorable, and useful instead of generic.</p>
+      <p>
+        <a class="button" href="/portfolio/">See the framework</a>
+        <a class="button" href="/manifesto/">Read manifesto</a>
+        <a class="button" href="/contact/">Start a conversation</a>
+      </p>
+    </div>
+    <div class="hero-card">
+      <svg viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width='600' height='320' fill='rgba(17,17,9,0.55)' />
+      <rect x='379' y='227' width='80' height='46' fill='rgba(200,168,75,0.04)' stroke='rgba(200,168,75,0.14)' />
+      <rect x='326' y='176' width='57' height='30' fill='rgba(200,168,75,0.08)' stroke='rgba(200,168,75,0.14)' />
+      <rect x='74' y='229' width='99' height='34' fill='rgba(200,168,75,0.08)' stroke='rgba(200,168,75,0.14)' />
+      <rect x='370' y='113' width='88' height='43' fill='rgba(200,168,75,0.05)' stroke='rgba(200,168,75,0.14)' />
+      <line x1='219' y1='533' x2='353' y2='460' stroke='rgba(200,168,75,0.15)' stroke-width='2' />
+      <line x1='123' y1='426' x2='461' y2='300' stroke='rgba(200,168,75,0.23)' stroke-width='2' />
+      <line x1='233' y1='281' x2='452' y2='312' stroke='rgba(200,168,75,0.27)' stroke-width='2' />
+      <line x1='227' y1='239' x2='42' y2='214' stroke='rgba(200,168,75,0.15)' stroke-width='1' />
+      <line x1='399' y1='100' x2='226' y2='319' stroke='rgba(200,168,75,0.21)' stroke-width='1' />
+      <line x1='525' y1='279' x2='119' y2='278' stroke='rgba(200,168,75,0.14)' stroke-width='2' />
+      <line x1='455' y1='184' x2='396' y2='370' stroke='rgba(200,168,75,0.24)' stroke-width='2' />
+      <circle cx='540' cy='116' r='6' fill='none' stroke='rgba(200,168,75,0.26)' stroke-width='1' /><circle cx='540' cy='116' r='2' fill='rgba(200,168,75,0.65)' />
+      <circle cx='116' cy='80' r='10' fill='none' stroke='rgba(200,168,75,0.25)' stroke-width='1' /><circle cx='116' cy='80' r='2' fill='rgba(200,168,75,0.65)' />
+      <circle cx='349' cy='154' r='10' fill='none' stroke='rgba(200,168,75,0.26)' stroke-width='1' /><circle cx='349' cy='154' r='2' fill='rgba(200,168,75,0.65)' />
+      <circle cx='175' cy='226' r='10' fill='none' stroke='rgba(200,168,75,0.22)' stroke-width='1' /><circle cx='175' cy='226' r='2' fill='rgba(200,168,75,0.65)' />
+      <circle cx='526' cy='287' r='24' fill='none' stroke='rgba(200,168,75,0.13)' stroke-width='1' /><circle cx='526' cy='287' r='2' fill='rgba(200,168,75,0.65)' />
+      <circle cx='164' cy='212' r='10' fill='none' stroke='rgba(200,168,75,0.18)' stroke-width='1' /><circle cx='164' cy='212' r='2' fill='rgba(200,168,75,0.65)' />
+      <circle cx='532' cy='143' r='16' fill='none' stroke='rgba(200,168,75,0.27)' stroke-width='1' /><circle cx='532' cy='143' r='2' fill='rgba(200,168,75,0.65)' />
+      <circle cx='561' cy='139' r='6' fill='none' stroke='rgba(200,168,75,0.27)' stroke-width='1' /><circle cx='561' cy='139' r='2' fill='rgba(200,168,75,0.65)' />
+      <circle cx='85' cy='187' r='8' fill='none' stroke='rgba(200,168,75,0.14)' stroke-width='1' /><circle cx='85' cy='187' r='2' fill='rgba(200,168,75,0.65)' />
+      <text x='28' y='42' fill='rgba(200,168,75,0.75)' font-family='Share Tech Mono, monospace' font-size='14' letter-spacing='3'>PROFILE.NODE</text>
+      <text x='28' y='286' fill='rgba(212,207,196,0.35)' font-family='Share Tech Mono, monospace' font-size='10' letter-spacing='2'>SIGNAL ROUTE / MEMORY GRID / ATTENTION MAP</text></svg>
+      <div class="hero-label"><span>PROFILE.NODE</span><span>ABOUT</span></div>
+    </div>
+  </section>
+
+  <section class="grid-2">
+    <div class="card">
+      <div class="small-label">Background</div>
+      <h3>Design, writing, and systems</h3>
+      <p>My best work usually happens when form and meaning support each other. That is true in interface design, in content strategy, and in long-form writing. I care about environments that make the right thing easier to notice and easier to do.</p>
+      <p>That is also why this site has a strong thematic identity. The dossier language is not decoration. It is a way of making the structure legible.</p>
+    </div>
+    <div class="card">
+      <div class="small-label">Working Principle</div>
+      <h3>Make the signal obvious</h3>
+      <p>I’m interested in projects where the challenge is not just making something look better, but making it easier to understand, trust, and act on. Strong hierarchy, strong copy, and narrative consistency matter because people decide faster when the system is coherent.</p>
+    </div>
+  </section>
+
+  <section class="grid-3">
+    <div class="card"><div class="small-label">Service</div><h3>Website Design</h3><p>Landing pages, content-heavy websites, and portfolio structures with a clear message and usable hierarchy.</p></div>
+    <div class="card"><div class="small-label">Service</div><h3>Content Systems</h3><p>Editorial structure, blog architecture, and internal linking systems that help a site scale without losing its voice.</p></div>
+    <div class="card"><div class="small-label">Service</div><h3>Brand Narrative</h3><p>Positioning, narrative consistency, and visual decisions that make a personal brand feel intentional rather than improvised.</p></div>
+  </section>
+
+  <section class="meta-card content-shell">
+    <div class="meta-card-label">Best Fit</div>
+    <div class="meta-row"><div class="meta-key">Ideal Project</div><div class="meta-val">A brand, business, or personal platform that needs stronger positioning, cleaner page structure, and better content hierarchy.</div></div>
+    <div class="meta-row"><div class="meta-key">Approach</div><div class="meta-val">Strategy first, then structure, then visuals. The goal is not decoration. The goal is signal.</div></div>
+    <div class="meta-row"><div class="meta-key">Next Step</div><div class="meta-val"><a href="/contact/">Use the contact page</a> if you want help shaping a website, content system, or brand narrative.</div></div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="page-shell footer-row">
+    <div class="footer-copy">Hunter Knewbold / <a href="mailto:hunterknewbold@hunterknewboldcc.com">Email</a> / <a href="https://instagram.com/hunterknewbold" target="_blank" rel="noopener">Instagram</a> / <a href="https://x.com/HunterNewb92822" target="_blank" rel="noopener">X</a></div>
+    <div class="footer-status"><span class="status-dot"></span> System Online</div>
+  </div>
+</footer>
+<script src="/assets/js/global-ops.js"></script>
+</body>
+</html>

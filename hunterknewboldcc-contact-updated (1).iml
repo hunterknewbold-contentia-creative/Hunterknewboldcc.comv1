@@ -1,0 +1,940 @@
+from pathlib import Path
+from bs4 import BeautifulSoup
+import json, random, html, re, zipfile, os
+
+ROOT = Path('/mnt/data/hk_site_work')
+BASE_URL = 'https://hunterknewboldcc.com'
+SITE_NAME = 'Hunter Knewbold'
+SITE_TAGLINE = 'Systems Thinking, Behavioral Design, and Essays'
+
+published_posts = {
+    'beginning-with-hard-things': {
+        'title': 'Beginning With Hard Things',
+        'description': 'A personal essay on discipline, purpose, mental health, family responsibility, and the decision to stop organizing life around ease.',
+        'category': 'Personal Essays',
+        'type': 'Personal Essay',
+        'theme': 'Discipline / Purpose / Memory',
+        'tags': ['discipline', 'purpose', 'mental health', 'personal essay'],
+    },
+    'behavioral-integrity': {
+        'title': 'Behavioral Integrity: The Metric That Actually Matters',
+        'description': 'Why keeping small promises to yourself changes identity, self-trust, and the way your brain predicts your future behavior.',
+        'category': 'Behavioral Design',
+        'type': 'Behavioral Essay',
+        'theme': 'Self-Trust / Consistency / Identity',
+        'tags': ['behavioral integrity', 'self-trust', 'identity', 'habits'],
+    },
+    'environment-design-is-weaponized-friction-removal': {
+        'title': 'Environment Design Strategies: Friction Removal That Makes Discipline Easier',
+        'description': 'Environment design strategies for focus, follow-through, and friction removal so good behavior becomes the default path.',
+        'category': 'Behavioral Design',
+        'type': 'Behavioral Essay',
+        'theme': 'Environment / Friction / Follow-Through',
+        'tags': ['environment design strategies', 'friction removal', 'focus', 'behavioral science'],
+        'lede': 'Environment design strategies work because invisible friction spends your discipline before the real work begins.'
+    },
+    'attention-architecture': {
+        'title': 'Attention Architecture: What Behavioral Science and Brutalist Design Have in Common',
+        'description': 'A behavioral design essay on attention architecture, visible hierarchy, stopping cues, and why structure restores focus.',
+        'category': 'Behavioral Design',
+        'type': 'Design Essay',
+        'theme': 'Attention / Structure / Design',
+        'tags': ['attention architecture', 'behavioral science in design', 'focus', 'brutalism'],
+        'lede': 'Attention architecture starts when structure becomes visible enough to guide action.'
+    },
+    'ugly-design-is-better': {
+        'title': 'Ugly Design Is Better: Brutalist Design Principles for Better Attention',
+        'description': 'Brutalist design principles can interrupt passive scrolling, increase salience, and make important content harder to ignore.',
+        'category': 'Behavioral Design',
+        'type': 'Design Essay',
+        'theme': 'Productive Friction / Salience / Interface Design',
+        'tags': ['brutalist design principles', 'productive friction', 'attention', 'interface design'],
+        'lede': 'Ugly design is better when it creates just enough friction to wake the brain up.'
+    },
+    'slow-tech-deep-bonds': {
+        'title': 'Slow Tech, Deep Bonds: A Counter-Protocol for the Acceleration Age',
+        'description': 'A manifesto for slow tech, chosen friction, device-free rituals, and relationship systems that deepen connection.',
+        'category': 'Behavioral Design',
+        'type': 'Manifesto',
+        'theme': 'Relationships / Friction / Attention',
+        'tags': ['slow tech', 'deep bonds', 'relationships', 'friction'],
+    },
+    'the-rise-of-osint': {
+        'title': 'OSINT in Research: How Open-Source Intelligence Shapes Modern Research',
+        'description': 'OSINT in research is becoming a serious discipline for synthesis, verification, and pattern recognition in public information.',
+        'category': 'AI & Cognitive Ops',
+        'type': 'Research Essay',
+        'theme': 'OSINT / Research / Public Intelligence',
+        'tags': ['OSINT in research', 'open-source intelligence research', 'research', 'analysis'],
+        'lede': 'OSINT in research matters because public information becomes strategic when it is gathered with discipline.'
+    },
+    'the-new-stack': {
+        'title': 'The New Stack: How AI-First Development Is Changing the Web’s DNA',
+        'description': 'A systems-level essay on AI-first development, the changing role of developers, and the shift from syntax production to systems direction.',
+        'category': 'AI & Cognitive Ops',
+        'type': 'AI Essay',
+        'theme': 'AI / Development / Systems Direction',
+        'tags': ['AI-first development', 'web development', 'systems thinking', 'AI'],
+    },
+    'from-skinner-boxes-to-chat-boxes': {
+        'title': 'From Skinner Boxes to Chat Boxes: How Operant Conditioning Powers Generative AI',
+        'description': 'A behavioral history of generative AI through reinforcement, shaping, RLHF, and the strange loop of users training machines while being trained by them.',
+        'category': 'AI & Cognitive Ops',
+        'type': 'AI Essay',
+        'theme': 'Behaviorism / AI / Reinforcement',
+        'tags': ['operant conditioning', 'RLHF', 'generative AI', 'behaviorism'],
+    },
+    'addictive-intelligence': {
+        'title': 'Addictive Intelligence: Are Generative AI Tools Designing Your Behavior?',
+        'description': 'A behavioral audit of variable-ratio reinforcement, conversational dark patterns, and operant conditioning in AI chat tools.',
+        'category': 'AI & Cognitive Ops',
+        'type': 'AI Essay',
+        'theme': 'AI / Reinforcement / UX',
+        'tags': ['addictive intelligence', 'AI behavior', 'reinforcement', 'dark patterns'],
+    },
+    'the-prompt-engineer-as-behaviorist': {
+        'title': 'The Prompt Engineer as Behaviorist: Shaping AI Through Stimulus-Response Chains',
+        'description': 'Prompt engineering becomes clearer when treated as antecedents, behaviors, and consequences rather than magic.',
+        'category': 'AI & Cognitive Ops',
+        'type': 'AI Essay',
+        'theme': 'Prompting / Behaviorism / Systems',
+        'tags': ['prompt engineering', 'behaviorism', 'AI prompting', 'stimulus response'],
+    },
+    'building-a-personal-brand-with-narrative-consistency': {
+        'title': 'Personal Brand Consistency: Building Narrative Coherence in Design',
+        'description': 'Personal brand consistency comes from aligning your site, visuals, writing, and positioning so the same story is reinforced everywhere.',
+        'category': 'Brand & Portfolio Systems',
+        'type': 'Brand Essay',
+        'theme': 'Narrative / Brand / Positioning',
+        'tags': ['personal brand consistency', 'narrative coherence in design', 'branding', 'positioning'],
+        'lede': 'Personal brand consistency is what happens when your visuals, writing, and promises all tell the same story.'
+    },
+    'why-i-use-a-spy-ops-aesthetic-for-my-portfolio': {
+        'title': 'Why I Use a Spy-Ops Aesthetic for My Portfolio',
+        'description': 'A personal brand essay on spy-ops aesthetics, classified dossier visuals, and building a memorable creative identity.',
+        'category': 'Brand & Portfolio Systems',
+        'type': 'Personal Brand Essay',
+        'theme': 'Visual Identity / Personal Brand / Aesthetic',
+        'tags': ['spy-ops aesthetic', 'classified dossier visuals', 'retro terminal design', 'portfolio'],
+    },
+    'how-to-build-a-thematic-content-hub': {
+        'title': 'How to Build a Thematic Content Hub: Lessons From Intelligence Dossiers',
+        'description': 'A guide to thematic content hubs, strong visual metaphors, and site structures that make content easier to navigate and remember.',
+        'category': 'Brand & Portfolio Systems',
+        'type': 'Systems Essay',
+        'theme': 'Content Hub / Information Architecture / Theme',
+        'tags': ['thematic content hub', 'portfolio architecture', 'content systems', 'information architecture'],
+    },
+    'design-tokens-as-a-creative-constraint': {
+        'title': 'Design Tokens as Creative Constraint: Why Consistency Makes You Faster',
+        'description': 'Design tokens speed up creative work by reducing decision fatigue and making visual consistency easier to maintain.',
+        'category': 'Brand & Portfolio Systems',
+        'type': 'Design Systems Essay',
+        'theme': 'Design Tokens / Constraints / Speed',
+        'tags': ['design tokens', 'portfolio framework design', 'signal structure design', 'systems'],
+    },
+    'the-pattern-stack': {
+        'title': 'The Pattern Stack: Building a Closed-Loop Operating System for Your Life',
+        'description': 'A systems essay on capture, processing, execution, and recovery as a closed-loop operating system for daily life.',
+        'category': 'Systems & Practice',
+        'type': 'Systems Essay',
+        'theme': 'Capture / Processing / Execution / Recovery',
+        'tags': ['pattern stack', 'systems thinking', 'operating system', 'productivity'],
+    },
+    'the-self-reporting-stack': {
+        'title': 'The Self-Reporting Stack: Building a Personal Data Practice That Actually Works',
+        'description': 'A behavioral systems essay on reactive self-monitoring, biometrics, logging, and a practical personal data stack.',
+        'category': 'Systems & Practice',
+        'type': 'Systems Essay',
+        'theme': 'Self-Monitoring / Data / Systems',
+        'tags': ['self-reporting stack', 'habit tracking', 'biometrics', 'systems thinking'],
+    },
+}
+
+# draft pages kept noindex until finalized
+seo_drafts = {
+    'retro-terminal-design': {
+        'title': 'Retro Terminal Design: Why Constraint Creates Identity',
+        'description': 'A draft post on retro terminal design, visual constraint, and why deliberate limits make a creative system easier to recognize and remember.',
+        'category': 'SEO Draft / Brand & Design',
+        'type': 'Draft Brief',
+        'theme': 'Retro Terminal Design / Visual Constraint / Identity',
+        'tags': ['retro terminal design', 'visual identity', 'constraint', 'branding'],
+    },
+    'behavioral-science-in-design': {
+        'title': 'Behavioral Science in Design: How Interfaces Shape Action',
+        'description': 'A draft post on behavioral science in design, choice architecture, friction, and the way interfaces steer behavior before conscious thought catches up.',
+        'category': 'SEO Draft / Behavioral Design',
+        'type': 'Draft Brief',
+        'theme': 'Behavioral Science / UX / Choice Architecture',
+        'tags': ['behavioral science in design', 'UX', 'choice architecture', 'interface'],
+    },
+    'classified-dossier-visuals': {
+        'title': 'Classified Dossier Visuals: Building a Memorable Personal Brand System',
+        'description': 'A draft post on classified dossier visuals as a brand system for hierarchy, memory, and narrative coherence.',
+        'category': 'SEO Draft / Brand & Design',
+        'type': 'Draft Brief',
+        'theme': 'Classified Dossier Visuals / Brand System / Memory',
+        'tags': ['classified dossier visuals', 'brand system', 'visual identity', 'portfolio'],
+    },
+    'brutalist-design-principles': {
+        'title': 'Brutalist Design Principles That Improve Attention',
+        'description': 'A draft post on brutalist design principles, productive friction, and why visual harshness can sharpen focus when used with restraint.',
+        'category': 'SEO Draft / Behavioral Design',
+        'type': 'Draft Brief',
+        'theme': 'Brutalism / Attention / Productive Friction',
+        'tags': ['brutalist design principles', 'attention', 'friction', 'web design'],
+    },
+    'signal-structure-design': {
+        'title': 'Signal Structure Design: Making Hierarchy Visible',
+        'description': 'A draft post on signal structure design, hierarchy, and how making information architecture explicit improves comprehension.',
+        'category': 'SEO Draft / Design Systems',
+        'type': 'Draft Brief',
+        'theme': 'Hierarchy / Signal / Structure',
+        'tags': ['signal structure design', 'hierarchy', 'information architecture', 'design'],
+    },
+    'narrative-coherence-in-design': {
+        'title': 'Narrative Coherence in Design: Why Brand Systems Break When the Story Splits',
+        'description': 'A draft post on narrative coherence in design, consistent signals, and how fractured messaging weakens trust.',
+        'category': 'SEO Draft / Brand & Design',
+        'type': 'Draft Brief',
+        'theme': 'Narrative / Coherence / Brand Systems',
+        'tags': ['narrative coherence in design', 'brand systems', 'consistency', 'story'],
+    },
+}
+
+related_map = {
+    'beginning-with-hard-things': ['behavioral-integrity', 'the-pattern-stack', 'slow-tech-deep-bonds'],
+    'behavioral-integrity': ['beginning-with-hard-things', 'environment-design-is-weaponized-friction-removal', 'the-pattern-stack'],
+    'environment-design-is-weaponized-friction-removal': ['attention-architecture', 'ugly-design-is-better', 'behavioral-science-in-design'],
+    'attention-architecture': ['environment-design-is-weaponized-friction-removal', 'ugly-design-is-better', 'signal-structure-design'],
+    'ugly-design-is-better': ['brutalist-design-principles', 'attention-architecture', 'behavioral-science-in-design'],
+    'slow-tech-deep-bonds': ['behavioral-integrity', 'beginning-with-hard-things', 'the-pattern-stack'],
+    'the-rise-of-osint': ['the-new-stack', 'from-skinner-boxes-to-chat-boxes', 'the-self-reporting-stack'],
+    'the-new-stack': ['the-rise-of-osint', 'the-prompt-engineer-as-behaviorist', 'addictive-intelligence'],
+    'from-skinner-boxes-to-chat-boxes': ['addictive-intelligence', 'the-prompt-engineer-as-behaviorist', 'the-new-stack'],
+    'addictive-intelligence': ['from-skinner-boxes-to-chat-boxes', 'the-prompt-engineer-as-behaviorist', 'slow-tech-deep-bonds'],
+    'the-prompt-engineer-as-behaviorist': ['from-skinner-boxes-to-chat-boxes', 'the-new-stack', 'addictive-intelligence'],
+    'building-a-personal-brand-with-narrative-consistency': ['why-i-use-a-spy-ops-aesthetic-for-my-portfolio', 'design-tokens-as-a-creative-constraint', 'narrative-coherence-in-design'],
+    'why-i-use-a-spy-ops-aesthetic-for-my-portfolio': ['classified-dossier-visuals', 'retro-terminal-design', 'building-a-personal-brand-with-narrative-consistency'],
+    'how-to-build-a-thematic-content-hub': ['design-tokens-as-a-creative-constraint', 'signal-structure-design', 'classified-dossier-visuals'],
+    'design-tokens-as-a-creative-constraint': ['signal-structure-design', 'building-a-personal-brand-with-narrative-consistency', 'how-to-build-a-thematic-content-hub'],
+    'the-pattern-stack': ['behavioral-integrity', 'the-self-reporting-stack', 'beginning-with-hard-things'],
+    'the-self-reporting-stack': ['the-pattern-stack', 'behavioral-integrity', 'the-new-stack'],
+    'retro-terminal-design': ['why-i-use-a-spy-ops-aesthetic-for-my-portfolio', 'classified-dossier-visuals', 'design-tokens-as-a-creative-constraint'],
+    'behavioral-science-in-design': ['environment-design-is-weaponized-friction-removal', 'attention-architecture', 'brutalist-design-principles'],
+    'classified-dossier-visuals': ['why-i-use-a-spy-ops-aesthetic-for-my-portfolio', 'retro-terminal-design', 'how-to-build-a-thematic-content-hub'],
+    'brutalist-design-principles': ['ugly-design-is-better', 'attention-architecture', 'behavioral-science-in-design'],
+    'signal-structure-design': ['design-tokens-as-a-creative-constraint', 'attention-architecture', 'how-to-build-a-thematic-content-hub'],
+    'narrative-coherence-in-design': ['building-a-personal-brand-with-narrative-consistency', 'classified-dossier-visuals', 'retro-terminal-design'],
+}
+
+all_posts = {**published_posts, **seo_drafts}
+
+cluster_sections = [
+    ('Behavioral Design Essays', ['behavioral-integrity', 'environment-design-is-weaponized-friction-removal', 'attention-architecture', 'ugly-design-is-better', 'slow-tech-deep-bonds']),
+    ('Brand, Portfolio, and Design Systems', ['building-a-personal-brand-with-narrative-consistency', 'why-i-use-a-spy-ops-aesthetic-for-my-portfolio', 'how-to-build-a-thematic-content-hub', 'design-tokens-as-a-creative-constraint']),
+    ('AI and Cognitive Operations', ['the-rise-of-osint', 'the-new-stack', 'from-skinner-boxes-to-chat-boxes', 'addictive-intelligence', 'the-prompt-engineer-as-behaviorist']),
+    ('Systems and Practice', ['the-pattern-stack', 'the-self-reporting-stack', 'beginning-with-hard-things']),
+]
+
+def post_url(slug):
+    return f'/blog/{slug}/'
+
+def full_url(path):
+    return f'{BASE_URL}{path}'
+
+def read(path):
+    return Path(path).read_text(encoding='utf-8')
+
+def write(path, text):
+    p = Path(path)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(text, encoding='utf-8')
+
+def hero_svg(label, sublabel='SIGNAL ROUTE / MEMORY GRID / ATTENTION MAP'):
+    r = random.Random(label)
+    parts = ["<rect width='600' height='320' fill='rgba(17,17,9,0.55)' />"]
+    for _ in range(4):
+        x, y = r.randint(25, 500), r.randint(20, 230)
+        w, h = r.randint(35, 110), r.randint(16, 52)
+        a = f"0.{r.randint(3,9)}"
+        parts.append(f"<rect x='{x}' y='{y}' width='{w}' height='{h}' fill='rgba(200,168,75,0.0{r.randint(3,9)})' stroke='rgba(200,168,75,0.14)' />")
+    for _ in range(7):
+        x1,y1,x2,y2 = [r.randint(20,580) for _ in range(4)]
+        parts.append(f"<line x1='{x1}' y1='{y1}' x2='{x2}' y2='{y2}' stroke='rgba(200,168,75,0.{r.randint(12,32)})' stroke-width='{r.choice([1,2])}' />")
+    for _ in range(9):
+        x,y = r.randint(25,570), r.randint(25,290)
+        rad = r.choice([6,8,10,16,24])
+        parts.append(f"<circle cx='{x}' cy='{y}' r='{rad}' fill='none' stroke='rgba(200,168,75,0.{r.randint(8,28)})' stroke-width='1' /><circle cx='{x}' cy='{y}' r='2' fill='rgba(200,168,75,0.65)' />")
+    parts.append(f"<text x='28' y='42' fill='rgba(200,168,75,0.75)' font-family='Share Tech Mono, monospace' font-size='14' letter-spacing='3'>{html.escape(label.upper())}</text>")
+    parts.append(f"<text x='28' y='286' fill='rgba(212,207,196,0.35)' font-family='Share Tech Mono, monospace' font-size='10' letter-spacing='2'>{html.escape(sublabel)}</text>")
+    return "\n      ".join(parts)
+
+NAV = '<ul class="nav-links"><li><a data-nav href="/">Root Terminal</a></li><li><a data-nav href="/about/">Operator Profile</a></li><li><a data-nav href="/portfolio/">Field Operations</a></li><li><a data-nav href="/blog/">Intel Logs</a></li><li><a data-nav href="/contact/">Secure Uplink</a></li></ul>'
+
+FONT_BLOCK = """<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;500;600&family=Rajdhani:wght@500;700&family=Share+Tech+Mono&display=swap\" rel=\"stylesheet\">"""
+
+
+def default_schema(kind, title, desc, canonical):
+    if kind == 'website':
+        return {
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            'name': f'{SITE_NAME} — {SITE_TAGLINE}',
+            'url': canonical,
+            'description': desc,
+            'publisher': {'@type': 'Person', 'name': SITE_NAME}
+        }
+    if kind == 'person':
+        return {
+            '@context': 'https://schema.org',
+            '@type': 'Person',
+            'name': SITE_NAME,
+            'url': BASE_URL,
+            'jobTitle': 'Web Designer and Content Creator',
+            'description': desc,
+            'knowsAbout': ['web design', 'content strategy', 'behavioral design', 'systems thinking', 'writing']
+        }
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        'headline': title,
+        'description': desc,
+        'author': {'@type': 'Person', 'name': SITE_NAME},
+        'publisher': {'@type': 'Person', 'name': SITE_NAME},
+        'mainEntityOfPage': canonical,
+        'datePublished': '2026-03-11',
+        'dateModified': '2026-03-11'
+    }
+
+
+def head_tags(title, description, canonical, article=False, noindex=False, schema_kind='website', extra_meta=''):
+    og_type = 'article' if article else 'website'
+    robots = 'noindex,follow' if noindex else 'index,follow'
+    schema = json.dumps(default_schema(schema_kind, title, description, canonical), ensure_ascii=False)
+    return f"""<head>
+  <meta charset=\"UTF-8\">
+  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+  <title>{html.escape(title)} | {SITE_NAME}</title>
+  <meta name=\"description\" content=\"{html.escape(description)}\">
+  <meta name=\"theme-color\" content=\"#0a0a08\">
+  <meta name=\"robots\" content=\"{robots}\">
+  <meta property=\"og:title\" content=\"{html.escape(title)}\">
+  <meta property=\"og:description\" content=\"{html.escape(description)}\">
+  <meta property=\"og:type\" content=\"{og_type}\">
+  <meta property=\"og:url\" content=\"{html.escape(canonical)}\">
+  <meta property=\"og:site_name\" content=\"{SITE_NAME}\">
+  <meta name=\"twitter:card\" content=\"summary_large_image\">
+  <meta name=\"twitter:title\" content=\"{html.escape(title)}\">
+  <meta name=\"twitter:description\" content=\"{html.escape(description)}\">
+  <link rel=\"icon\" type=\"image/svg+xml\" href=\"/assets/img/favicon.svg\">
+  <link rel=\"canonical\" href=\"{html.escape(canonical)}\">
+  <link rel=\"stylesheet\" href=\"/assets/css/design-tokens.css\">
+  <link rel=\"stylesheet\" href=\"/assets/css/dossier-base.css\">
+  <link rel=\"stylesheet\" href=\"/assets/css/components.css\">
+  <link rel=\"stylesheet\" href=\"/assets/css/layout.css\">
+  {FONT_BLOCK}
+  {extra_meta}
+  <script type=\"application/ld+json\">{schema}</script>
+</head>"""
+
+
+def page_template(title, description, canonical_path, body_html, article=False, noindex=False, schema_kind='website'):
+    canonical = full_url(canonical_path)
+    return f"""<!DOCTYPE html>
+<html lang='en'>
+{head_tags(title, description, canonical, article=article, noindex=noindex, schema_kind=schema_kind)}
+<body>
+<div class=\"read-progress\"></div>
+<header class=\"site-header\">
+  <div class=\"page-shell nav-row\">
+    <a class=\"nav-logo\" href=\"/\">Hunter Knewbold</a>
+    {NAV}
+  </div>
+</header>
+{body_html}
+<footer class=\"site-footer\">
+  <div class=\"page-shell footer-row\">
+    <div class=\"footer-copy\">Hunter Knewbold / Systems Thinking / Portfolio / Blog</div>
+    <div class=\"footer-status\"><span class=\"status-dot\"></span> System Online</div>
+  </div>
+</footer>
+<script src=\"/assets/js/global-ops.js\"></script>
+</body>
+</html>"""
+
+
+def card_for(slug):
+    meta = all_posts[slug]
+    draft = slug in seo_drafts
+    note = ' / noindex draft' if draft else ''
+    return f"""<article class=\"card\">
+      <div class=\"card-meta\">{html.escape(meta['category'])}{note}</div>
+      <h3>{html.escape(meta['title'])}</h3>
+      <p>{html.escape(meta['description'])}</p>
+      <a class=\"card-link\" href=\"{post_url(slug)}\">Open file →</a>
+    </article>"""
+
+# Generate improved core pages
+home_body = f"""
+<main class=\"page-shell\">
+  <div class=\"classification-banner\">
+    <div class=\"classification-badge\">Root Terminal</div>
+    <div class=\"classification-meta\">Hunter Knewbold portfolio, systems thinking blog, behavioral design essays, and personal writing under one coherent archive.</div>
+  </div>
+
+  <section class=\"hero-shell\">
+    <div class=\"content-shell\">
+      <div class=\"kicker\" data-type data-speed=\"14\">ROOT ACCESS / CONTENTIA CREATIVE / ACTIVE ARCHIVE</div>
+      <h1 class=\"page-title\">Hunter Knewbold <em>Portfolio</em> — systems thinking, behavioral design, and essays.</h1>
+      <p class=\"lede\">I design websites, build content systems, and write about behavioral science, AI, attention, and personal discipline. This site is the public archive where the portfolio and the thinking behind it live together.</p>
+      <p><a class=\"button\" href=\"/portfolio/\">View portfolio</a> <a class=\"button\" href=\"/blog/\">Read essays</a> <a class=\"button\" href=\"/contact/\">Contact me</a></p>
+    </div>
+    <div class=\"hero-card\">
+      <svg viewBox=\"0 0 600 320\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\">{hero_svg('ROOT.SIGNAL')}</svg>
+      <div class=\"hero-label\"><span>ROOT.SIGNAL</span><span>PORTFOLIO / BLOG</span></div>
+    </div>
+  </section>
+
+  <section class=\"mission-grid\">
+    <div>
+      <h2 class=\"section-title\">What I Do</h2>
+      <div class=\"section-copy\">
+        <p>I work at the intersection of web design, writing, and systems thinking. The through-line is clarity: stronger hierarchy, stronger narrative, and cleaner decisions for the people using what I build.</p>
+        <p>The site is organized to support that same point of view. The portfolio shows how I think through websites and content systems. The blog explores behavioral design, attention architecture, AI, brand narrative, and self-mastery.</p>
+      </div>
+    </div>
+    <div class=\"sidebar-stack\">
+      <div class=\"card\">
+        <div class=\"small-label\">Services</div>
+        <h3>Web Design & Content Systems</h3>
+        <p>Brand-aware websites, portfolio architecture, editorial systems, and content structures built for clarity and conversion.</p>
+      </div>
+      <div class=\"card\">
+        <div class=\"small-label\">Themes</div>
+        <h3>Behavioral Design Essays</h3>
+        <p>Writing on friction, attention, narrative consistency, AI, systems thinking, and personal discipline.</p>
+      </div>
+      <div class=\"card\">
+        <div class=\"small-label\">Best Entry Point</div>
+        <h3>Start Here</h3>
+        <p>Read the featured essay, then move into the blog clusters or the portfolio framework depending on why you came.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <section>
+    <h2 class=\"section-title\">Featured Entry</h2>
+    <article class=\"card content-shell\">
+      <div class=\"card-meta\">Personal Essay / March 11, 2026</div>
+      <h3>Beginning With Hard Things</h3>
+      <p>A personal essay on discipline, purpose, mental health, family responsibility, and the decision to stop organizing life around ease.</p>
+      <a class=\"card-link\" href=\"/blog/beginning-with-hard-things/\">Read featured dossier →</a>
+    </article>
+  </section>
+
+  <hr>
+
+  <section>
+    <h2 class=\"section-title\">Recent Files</h2>
+    <div class=\"archive-grid\">
+      {card_for('beginning-with-hard-things')}
+      {card_for('attention-architecture')}
+      {card_for('building-a-personal-brand-with-narrative-consistency')}
+      {card_for('the-rise-of-osint')}
+      {card_for('why-i-use-a-spy-ops-aesthetic-for-my-portfolio')}
+      {card_for('environment-design-is-weaponized-friction-removal')}
+    </div>
+  </section>
+</main>
+"""
+write(ROOT / 'index.html', page_template(
+    'Hunter Knewbold Portfolio | Systems Thinking, Behavioral Design, and Essays',
+    'Explore Hunter Knewbold’s portfolio, systems thinking blog, behavioral design essays, and personal writing on discipline, attention, design, and AI.',
+    '/', home_body, schema_kind='person'
+))
+
+about_body = f"""
+<main class=\"page-shell\">
+  <div class=\"classification-banner\">
+    <div class=\"classification-badge\">Operator Profile</div>
+    <div class=\"classification-meta\">About Hunter Knewbold — web designer, content creator, systems thinker, and long-form writer.</div>
+  </div>
+
+  <section class=\"hero-shell\">
+    <div class=\"content-shell\">
+      <div class=\"kicker\">PROFILE / SYSTEMS / VOICE</div>
+      <h1 class=\"page-title\">I build with <em>clarity, structure, and narrative consistency</em>.</h1>
+      <p class=\"lede\">I’m Hunter Knewbold, a web designer and content creator. My work blends visual systems, writing, and behavioral thinking so websites feel coherent, memorable, and useful instead of generic.</p>
+      <p><a class=\"button\" href=\"/portfolio/\">See the framework</a> <a class=\"button\" href=\"/contact/\">Start a conversation</a></p>
+    </div>
+    <div class=\"hero-card\">
+      <svg viewBox=\"0 0 600 320\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\">{hero_svg('PROFILE.NODE')}</svg>
+      <div class=\"hero-label\"><span>PROFILE.NODE</span><span>ABOUT</span></div>
+    </div>
+  </section>
+
+  <section class=\"grid-2\">
+    <div class=\"card\">
+      <div class=\"small-label\">Background</div>
+      <h3>Design, writing, and systems</h3>
+      <p>My best work usually happens when form and meaning support each other. That is true in interface design, in content strategy, and in long-form writing. I care about environments that make the right thing easier to notice and easier to do.</p>
+      <p>That is also why this site has a strong thematic identity. The dossier language is not decoration. It is a way of making the structure legible.</p>
+    </div>
+    <div class=\"card\">
+      <div class=\"small-label\">Working Principle</div>
+      <h3>Make the signal obvious</h3>
+      <p>I’m interested in projects where the challenge is not just making something look better, but making it easier to understand, trust, and act on. Strong hierarchy, strong copy, and narrative consistency matter because people decide faster when the system is coherent.</p>
+    </div>
+  </section>
+
+  <section class=\"grid-3\">
+    <div class=\"card\"><div class=\"small-label\">Service</div><h3>Website Design</h3><p>Landing pages, content-heavy websites, and portfolio structures with a clear message and usable hierarchy.</p></div>
+    <div class=\"card\"><div class=\"small-label\">Service</div><h3>Content Systems</h3><p>Editorial structure, blog architecture, and internal linking systems that help a site scale without losing its voice.</p></div>
+    <div class=\"card\"><div class=\"small-label\">Service</div><h3>Brand Narrative</h3><p>Positioning, narrative consistency, and visual decisions that make a personal brand feel intentional rather than improvised.</p></div>
+  </section>
+
+  <section class=\"meta-card content-shell\">
+    <div class=\"meta-card-label\">Best Fit</div>
+    <div class=\"meta-row\"><div class=\"meta-key\">Ideal Project</div><div class=\"meta-val\">A brand, business, or personal platform that needs stronger positioning, cleaner page structure, and better content hierarchy.</div></div>
+    <div class=\"meta-row\"><div class=\"meta-key\">Approach</div><div class=\"meta-val\">Strategy first, then structure, then visuals. The goal is not decoration. The goal is signal.</div></div>
+    <div class=\"meta-row\"><div class=\"meta-key\">Next Step</div><div class=\"meta-val\"><a href=\"/contact/\">Use the contact page</a> if you want help shaping a website, content system, or brand narrative.</div></div>
+  </section>
+</main>
+"""
+write(ROOT / 'about/index.html', page_template(
+    'About Hunter Knewbold | Portfolio, Writing, and Narrative Consistency',
+    'Learn about Hunter Knewbold’s background in web design, content systems, behavioral design, and brand narrative.',
+    '/about/', about_body, schema_kind='person'
+))
+
+portfolio_body = f"""
+<main class=\"page-shell\">
+  <div class=\"classification-banner\">
+    <div class=\"classification-badge\">Field Operations</div>
+    <div class=\"classification-meta\">Portfolio architecture, case-study framework, and fill-in-the-blank project slots ready for real work.</div>
+  </div>
+
+  <section class=\"hero-shell\">
+    <div class=\"content-shell\">
+      <div class=\"kicker\">PORTFOLIO / CASE STUDIES / CLIENT WORK</div>
+      <h1 class=\"page-title\">Portfolio architecture built for <em>clarity, proof, and narrative consistency</em>.</h1>
+      <p class=\"lede\">This section is intentionally honest. It keeps the portfolio structure live without inventing projects that do not exist. Each slot shows how future case studies should be framed when real client work is ready to publish.</p>
+      <p><a class=\"button\" href=\"/contact/\">Ask about working together</a> <a class=\"button\" href=\"/blog/building-a-personal-brand-with-narrative-consistency/\">Read the brand essay</a></p>
+    </div>
+    <div class=\"hero-card\">
+      <svg viewBox=\"0 0 600 320\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\">{hero_svg('FIELD.OPS')}</svg>
+      <div class=\"hero-label\"><span>FIELD.OPS</span><span>PORTFOLIO</span></div>
+    </div>
+  </section>
+
+  <section class=\"grid-2\">
+    <div class=\"card\">
+      <div class=\"small-label\">What this page does</div>
+      <h3>Shows the structure before the volume</h3>
+      <p>A strong portfolio is not a random gallery. It is a proof system. Each case study should explain the context, your role, the decisions you made, and the outcome that mattered.</p>
+      <p>Until those projects are live, the better move is to show the framework clearly rather than fill the page with fictional wins.</p>
+    </div>
+    <div class=\"card\">
+      <div class=\"small-label\">What I can help with</div>
+      <h3>Website and brand systems</h3>
+      <p>Website structure, landing page hierarchy, portfolio architecture, message clarity, content systems, and visual direction that makes the work feel like it belongs together.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2 class=\"section-title\">Case Study Slots</h2>
+    <div class=\"portfolio-grid\">
+      <article class=\"card\"><div class=\"card-meta\">Client Website / Replace</div><h3>[Real Project Title 01]</h3><p>Use this slot for a homepage or service-site redesign. Show the client context, what was unclear before, and what changed after the rebuild.</p><div class=\"note-box\">Add screenshots, role, process, and measurable results.</div></article>
+      <article class=\"card\"><div class=\"card-meta\">Brand System / Replace</div><h3>[Real Project Title 02]</h3><p>Use this slot for identity, narrative, or content-system work. Explain the core brand problem and how the final system created coherence.</p><div class=\"note-box\">Add before-and-after hierarchy examples and key messaging shifts.</div></article>
+      <article class=\"card\"><div class=\"card-meta\">Landing Page / Replace</div><h3>[Real Project Title 03]</h3><p>Use this slot for conversion-focused design. Show the page goal, the friction points, and how your layout or copy improved the path to action.</p><div class=\"note-box\">Add CTA logic, user-flow notes, and outcome metrics.</div></article>
+      <article class=\"card\"><div class=\"card-meta\">Content Architecture / Replace</div><h3>[Real Project Title 04]</h3><p>Use this slot for blogs, resource hubs, or editorial systems. Explain how the structure made content easier to navigate and remember.</p><div class=\"note-box\">Add sitemap, internal-link strategy, and publishing workflow.</div></article>
+      <article class=\"card\"><div class=\"card-meta\">Research-Driven Build / Replace</div><h3>[Real Project Title 05]</h3><p>Use this slot for projects shaped by audience research or behavioral insight. Show how the evidence changed the design direction.</p><div class=\"note-box\">Add research summary, constraints, and final design rationale.</div></article>
+      <article class=\"card\"><div class=\"card-meta\">Campaign Asset / Replace</div><h3>[Real Project Title 06]</h3><p>Use this slot for a launch, campaign, or creative system. Clarify the objective, execution environment, and what the finished asset had to accomplish.</p><div class=\"note-box\">Add timeline, deliverables, and final performance notes.</div></article>
+    </div>
+  </section>
+
+  <section class=\"meta-card content-shell\">
+    <div class=\"meta-card-label\">Suggested Case Study Structure</div>
+    <div class=\"meta-row\"><div class=\"meta-key\">Client / Context</div><div class=\"meta-val\">Who the work was for and what problem existed before the build.</div></div>
+    <div class=\"meta-row\"><div class=\"meta-key\">Role</div><div class=\"meta-val\">What you actually did: writing, design, strategy, development, research, or art direction.</div></div>
+    <div class=\"meta-row\"><div class=\"meta-key\">Constraint</div><div class=\"meta-val\">Budget, timeline, legacy system, brand limitations, or audience complexity.</div></div>
+    <div class=\"meta-row\"><div class=\"meta-key\">Process</div><div class=\"meta-val\">How you thought through the work and what decisions mattered most.</div></div>
+    <div class=\"meta-row\"><div class=\"meta-key\">Result</div><div class=\"meta-val\">Outcome, qualitative shift, or measurable impact.</div></div>
+  </section>
+</main>
+"""
+write(ROOT / 'portfolio/index.html', page_template(
+    'Portfolio Architecture | Hunter Knewbold Portfolio',
+    'Portfolio architecture for Hunter Knewbold, including case-study framework, content structure, and fill-in-the-blank project slots ready for real client work.',
+    '/portfolio/', portfolio_body, schema_kind='website'
+))
+
+contact_body = f"""
+<main class=\"page-shell\">
+  <div class=\"classification-banner\">
+    <div class=\"classification-badge\">Secure Uplink</div>
+    <div class=\"classification-meta\">Netlify-ready contact page for project inquiries, collaborations, and writing opportunities.</div>
+  </div>
+
+  <section class=\"hero-shell\">
+    <div class=\"content-shell\">
+      <div class=\"kicker\">CONTACT / COLLABORATION / INBOUND REQUESTS</div>
+      <h1 class=\"page-title\">Start a <em>clear conversation</em>.</h1>
+      <p class=\"lede\">Use this page for website inquiries, portfolio reviews, content-system work, writing opportunities, or thoughtful collaborations. The form is ready for Netlify deployment and routes to a thank-you page after submission.</p>
+    </div>
+    <div class=\"hero-card\">
+      <svg viewBox=\"0 0 600 320\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\">{hero_svg('UPLINK.OPEN')}</svg>
+      <div class=\"hero-label\"><span>UPLINK.OPEN</span><span>CONTACT</span></div>
+    </div>
+  </section>
+
+  <section class=\"grid-2\">
+    <div class=\"card\">
+      <div class=\"small-label\">Contact Form</div>
+      <h3>Netlify-ready form</h3>
+      <form class=\"form-grid\" name=\"contact\" method=\"POST\" data-netlify=\"true\" netlify-honeypot=\"bot-field\" action=\"/thanks/\">
+        <input type=\"hidden\" name=\"form-name\" value=\"contact\">
+        <p hidden><label>Do not fill this out <input name=\"bot-field\"></label></p>
+        <input type=\"text\" name=\"name\" placeholder=\"Your name\" required>
+        <input type=\"email\" name=\"email\" placeholder=\"Your email\" required>
+        <input type=\"text\" name=\"subject\" placeholder=\"Subject\">
+        <textarea name=\"message\" placeholder=\"What are you reaching out about?\" required></textarea>
+        <button class=\"button\" type=\"submit\">Transmit message</button>
+      </form>
+    </div>
+    <div class=\"sidebar-stack\">
+      <div class=\"card\">
+        <div class=\"small-label\">Response Policy</div>
+        <h3>What to send</h3>
+        <p>Project scope, timeline, budget range, and the result you want. Email works best for direct inquiries. Social links are open for lighter contact and ongoing updates.</p>
+      </div>
+      <div class=\"card\">
+        <div class=\"small-label\">Before launch</div>
+        <h3>Add your public contact details</h3>
+        <p>Replace this note with your public-facing email address and any links you want visible here: LinkedIn, GitHub, Instagram, newsletter, or other platforms.</p>
+      </div>
+      <div class=\"card\">
+        <div class=\"small-label\">Suggested Links</div>
+        <h3>Good supporting destinations</h3>
+        <p>About page, top portfolio case study, and one or two strong essays. Those links help new visitors verify your work before they reach out.</p>
+      </div>
+    </div>
+  </section>
+</main>
+"""
+write(ROOT / 'contact/index.html', page_template(
+    'Contact Hunter Knewbold | Website Inquiries and Collaborations',
+    'Contact Hunter Knewbold for website projects, content-system work, writing opportunities, and collaborations through a Netlify-ready form.',
+    '/contact/', contact_body, schema_kind='website'
+))
+
+thanks_body = f"""
+<main class=\"page-shell\">
+  <div class=\"classification-banner\"><div class=\"classification-badge\">Transmission Received</div><div class=\"classification-meta\">Your message was submitted successfully.</div></div>
+  <section class=\"hero-shell\">
+    <div class=\"content-shell\">
+      <div class=\"kicker\">UPLINK / CONFIRMED</div>
+      <h1 class=\"page-title\">Message <em>received</em>.</h1>
+      <p class=\"lede\">Thanks for reaching out. You can return to the portfolio, browse the writing archive, or head back to the homepage while you wait for a reply.</p>
+      <p><a class=\"button\" href=\"/portfolio/\">View portfolio</a> <a class=\"button\" href=\"/blog/\">Browse essays</a></p>
+    </div>
+    <div class=\"hero-card\"><svg viewBox=\"0 0 600 320\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\">{hero_svg('UPLINK.OK')}</svg><div class=\"hero-label\"><span>UPLINK.OK</span><span>THANK YOU</span></div></div>
+  </section>
+</main>
+"""
+write(ROOT / 'thanks/index.html', page_template(
+    'Thanks for Reaching Out',
+    'Confirmation page for successful contact form submissions on hunterknewboldcc.com.',
+    '/thanks/', thanks_body, schema_kind='website'
+))
+
+# Blog index
+sections_html = []
+for heading, slugs in cluster_sections:
+    cards = '\n'.join(card_for(slug) for slug in slugs)
+    sections_html.append(f"<section><h2 class=\"section-title\">{html.escape(heading)}</h2><div class=\"archive-grid\">{cards}</div></section>")
+
+draft_cards = '\n'.join(card_for(slug) for slug in seo_drafts.keys())
+blog_body = f"""
+<main class=\"page-shell\">
+  <div class=\"classification-banner\">
+    <div class=\"classification-badge\">Intel Logs</div>
+    <div class=\"classification-meta\">A systems thinking blog focused on behavioral design, personal essays on discipline, brand narrative, and AI-era research.</div>
+  </div>
+
+  <section class=\"hero-shell\">
+    <div class=\"content-shell\">
+      <div class=\"kicker\">ARCHIVE / BLOG / SIGNAL CLUSTERS</div>
+      <h1 class=\"page-title\">Systems thinking blog and <em>behavioral design essays</em>.</h1>
+      <p class=\"lede\">This archive brings together essays on attention architecture, environment design strategies, OSINT in research, personal brand consistency, self-mastery, and AI-driven systems change. Each post lives inside a cluster so the site builds topical authority instead of scattering ideas at random.</p>
+      <p><a class=\"button\" href=\"/blog/attention-architecture/\">Start with attention architecture</a> <a class=\"button\" href=\"/blog/the-rise-of-osint/\">Read OSINT in research</a></p>
+    </div>
+    <div class=\"hero-card\">
+      <svg viewBox=\"0 0 600 320\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\">{hero_svg('INTEL.LOGS')}</svg>
+      <div class=\"hero-label\"><span>INTEL.LOGS</span><span>BLOG ARCHIVE</span></div>
+    </div>
+  </section>
+
+  <section class=\"grid-3\">
+    <div class=\"card\"><div class=\"small-label\">Cluster</div><h3>Behavioral Design</h3><p>Friction removal, attention architecture, behavioral integrity, and the design of environments that make follow-through easier.</p></div>
+    <div class=\"card\"><div class=\"small-label\">Cluster</div><h3>Brand & Design Systems</h3><p>Retro terminal design, narrative coherence, classified dossier visuals, content hubs, and portfolio architecture.</p></div>
+    <div class=\"card\"><div class=\"small-label\">Cluster</div><h3>AI & Cognitive Operations</h3><p>OSINT, AI-first development, reinforcement loops, prompting, and the systems thinking required to work well with modern tools.</p></div>
+  </section>
+
+  {' '.join(sections_html)}
+
+  <section>
+    <h2 class=\"section-title\">Draft Files / SEO Placeholders</h2>
+    <div class=\"section-copy\"><p>These pages are structured and internally linked, but marked <code>noindex</code> until you expand them into full posts. They are included in the package so your next content sprint has ready-made landing pages around strong keyword opportunities.</p></div>
+    <div class=\"archive-grid\">{draft_cards}</div>
+  </section>
+</main>
+"""
+write(ROOT / 'blog/index.html', page_template(
+    'Systems Thinking Blog | Behavioral Design Essays by Hunter Knewbold',
+    'Read Hunter Knewbold’s systems thinking blog on behavioral design, attention architecture, personal brand consistency, self-mastery, and AI research.',
+    '/blog/', blog_body, schema_kind='website'
+))
+
+# Patch existing post pages
+for slug, meta in published_posts.items():
+    path = ROOT / 'blog' / slug / 'index.html'
+    soup = BeautifulSoup(read(path), 'html.parser')
+
+    # Update head
+    if soup.title:
+        soup.title.string = f"{meta['title']} | {SITE_NAME}"
+    desc_tag = soup.find('meta', attrs={'name':'description'})
+    if not desc_tag:
+        desc_tag = soup.new_tag('meta')
+        desc_tag['name'] = 'description'
+        soup.head.append(desc_tag)
+    desc_tag['content'] = meta['description']
+
+    robots = soup.find('meta', attrs={'name': 'robots'})
+    if not robots:
+        robots = soup.new_tag('meta')
+        robots['name'] = 'robots'
+        soup.head.append(robots)
+    robots['content'] = 'index,follow'
+
+    canonical = soup.find('link', attrs={'rel':'canonical'})
+    if canonical:
+        canonical['href'] = full_url(post_url(slug))
+
+    # remove existing og/twitter/script ld+json to avoid dupes
+    for tag in soup.find_all('meta', attrs={'property': re.compile(r'^og:')}) + soup.find_all('meta', attrs={'name': re.compile(r'^twitter:')}) + soup.find_all('script', attrs={'type':'application/ld+json'}):
+        tag.decompose()
+    ogs = [
+        {'property':'og:title','content':meta['title']},
+        {'property':'og:description','content':meta['description']},
+        {'property':'og:type','content':'article'},
+        {'property':'og:url','content':full_url(post_url(slug))},
+        {'property':'og:site_name','content':SITE_NAME},
+        {'name':'twitter:card','content':'summary_large_image'},
+        {'name':'twitter:title','content':meta['title']},
+        {'name':'twitter:description','content':meta['description']},
+    ]
+    for attrs in ogs:
+        tag = soup.new_tag('meta')
+        for k,v in attrs.items(): tag[k] = v
+        soup.head.append(tag)
+    schema = soup.new_tag('script', type='application/ld+json')
+    schema.string = json.dumps(default_schema('article', meta['title'], meta['description'], full_url(post_url(slug))), ensure_ascii=False)
+    soup.head.append(schema)
+
+    # Update h1, lede, tags
+    h1 = soup.select_one('.page-title')
+    if h1:
+        h1.string = meta['title']
+    lede = soup.select_one('.lede')
+    if lede and meta.get('lede'):
+        lede.string = meta['lede']
+    tag_list = soup.select_one('.tag-list')
+    if tag_list:
+        tag_list.clear()
+        for t in meta['tags'][:4]:
+            span = soup.new_tag('span', attrs={'class':'tag'})
+            span.string = t
+            tag_list.append(span)
+
+    # Update metadata card rows by label
+    for row in soup.select('.meta-row'):
+        key = row.select_one('.meta-key')
+        val = row.select_one('.meta-val')
+        if not key or not val:
+            continue
+        k = key.get_text(' ', strip=True).lower()
+        if k == 'title':
+            val.clear(); val.append(meta['title'])
+        elif k == 'type':
+            val.clear(); val.append(meta['type'])
+        elif k == 'theme':
+            val.clear(); val.append(meta['theme'])
+        elif k == 'category':
+            val.clear(); val.append(meta['category'])
+
+    # Insert related files section before meta-card
+    old_related = soup.find('section', attrs={'data-related':'1'})
+    if old_related:
+        old_related.decompose()
+    meta_card = soup.select_one('.meta-card')
+    related_section = soup.new_tag('section', attrs={'data-related':'1'})
+    h2 = soup.new_tag('h2', attrs={'class':'section-title'})
+    h2.string = 'Related Files'
+    related_section.append(h2)
+    grid = soup.new_tag('div', attrs={'class':'archive-grid'})
+    for rslug in related_map.get(slug, [])[:3]:
+        rmeta = all_posts[rslug]
+        article = BeautifulSoup(card_for(rslug), 'html.parser')
+        grid.append(article)
+    related_section.append(grid)
+    if meta_card:
+        meta_card.insert_before(related_section)
+    else:
+        soup.main.append(related_section)
+
+    write(path, str(soup))
+
+# Draft page generator
+
+def make_draft_post(slug, meta):
+    related_cards = '\n'.join(card_for(s) for s in related_map.get(slug, [])[:3])
+    keywords = ', '.join(meta['tags'])
+    body = f"""
+<main class=\"page-shell\">
+  <div class=\"classification-banner\">
+    <div class=\"classification-badge\">SEO Draft</div>
+    <div class=\"classification-meta\">Noindex placeholder — build this out before publishing it into the indexed archive.</div>
+  </div>
+
+  <section class=\"hero-shell\">
+    <div class=\"content-shell\">
+      <div class=\"kicker\">DRAFT FILE / MARCH 11, 2026</div>
+      <h1 class=\"page-title\">{html.escape(meta['title'])}</h1>
+      <p class=\"lede\">{html.escape(meta['description'])}</p>
+      <div class=\"tag-list\">{''.join(f'<span class=\"tag\">{html.escape(t)}</span>' for t in meta['tags'])}</div>
+    </div>
+    <div class=\"hero-card\"><svg viewBox=\"0 0 600 320\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\">{hero_svg(slug.replace('-', '.'))}</svg><div class=\"hero-label\"><span>{html.escape(slug.upper())}</span><span>DRAFT / NOINDEX</span></div></div>
+  </section>
+
+  <article class=\"post-body\">
+    <div class=\"callout\" data-label=\"Editorial Note\"><p>This page is intentionally included as a structured draft. It already has the correct title, meta description, canonical URL, internal links, and keyword focus, but it is marked <code>noindex</code> until you replace the outline with a finished article.</p></div>
+
+    <h2>Core Angle</h2>
+    <p>The goal of this future post is to rank for <strong>{html.escape(meta['tags'][0])}</strong> without sounding generic. The topic should be handled in the same voice as the rest of the archive: direct, systems-oriented, and grounded in a clear behavioral or design mechanism.</p>
+    <p>Use the opening to define the real problem behind the keyword. Then explain the mechanism. Then give the reader one concrete framework or action step. That structure will fit the rest of the site and preserve narrative consistency.</p>
+
+    <h2>Suggested Structure</h2>
+    <p><strong>Hook:</strong> start with one line of tension or friction. Make the topic feel immediate, not academic.</p>
+    <p><strong>Problem:</strong> describe what people misunderstand about this subject and why that misunderstanding creates weak design, weak branding, or weak execution.</p>
+    <p><strong>Mechanism:</strong> explain the behavioral, visual, or systems logic that makes the topic matter.</p>
+    <p><strong>Action:</strong> close with one practical step the reader can take today.</p>
+
+    <h2>Keyword Focus</h2>
+    <p>Primary keywords for this draft: <code>{html.escape(keywords)}</code>. Keep the primary phrase in the title, the H1, the first paragraph, one subheading, image alt text if relevant, and the meta description. Then support it with internal links to three related essays already live in the archive.</p>
+
+    <div class=\"pullquote\">Make the story coherent first. SEO works better when the site already knows what it is.</div>
+  </article>
+
+  <section>
+    <h2 class=\"section-title\">Related Files</h2>
+    <div class=\"archive-grid\">{related_cards}</div>
+  </section>
+
+  <section class=\"meta-card\">
+    <div class=\"meta-card-label\">Draft Metadata</div>
+    <div class=\"meta-row\"><div class=\"meta-key\">Title</div><div class=\"meta-val\">{html.escape(meta['title'])}</div></div>
+    <div class=\"meta-row\"><div class=\"meta-key\">Type</div><div class=\"meta-val\">{html.escape(meta['type'])}</div></div>
+    <div class=\"meta-row\"><div class=\"meta-key\">Theme</div><div class=\"meta-val\">{html.escape(meta['theme'])}</div></div>
+    <div class=\"meta-row\"><div class=\"meta-key\">Category</div><div class=\"meta-val\">{html.escape(meta['category'])}</div></div>
+    <div class=\"meta-row\"><div class=\"meta-key\">Status</div><div class=\"meta-val\">Noindex until replaced with a full article.</div></div>
+  </section>
+</main>
+"""
+    return page_template(meta['title'], meta['description'], post_url(slug), body, article=True, noindex=True, schema_kind='article')
+
+for slug, meta in seo_drafts.items():
+    write(ROOT / 'blog' / slug / 'index.html', make_draft_post(slug, meta))
+
+# improve 404 and README
+not_found = f"""
+<main class=\"page-shell\">
+  <div class=\"classification-banner\"><div class=\"classification-badge\">404</div><div class=\"classification-meta\">Requested file not found in current archive.</div></div>
+  <section class=\"hero-shell\">
+    <div class=\"content-shell\">
+      <div class=\"kicker\">MISSING FILE / REROUTE REQUIRED</div>
+      <h1 class=\"page-title\">That file is <em>missing</em>.</h1>
+      <p class=\"lede\">Head back to the root terminal, browse the intel logs, or open the portfolio section to keep moving.</p>
+      <p><a class=\"button\" href=\"/\">Go home</a> <a class=\"button\" href=\"/blog/\">Browse essays</a></p>
+    </div>
+    <div class=\"hero-card\"><svg viewBox=\"0 0 600 320\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\">{hero_svg('404.FILE')}</svg><div class=\"hero-label\"><span>404.FILE</span><span>NOT FOUND</span></div></div>
+  </section>
+</main>
+"""
+write(ROOT / '404.html', page_template('404 Not Found', 'Requested page not found.', '/404.html', not_found, schema_kind='website'))
+
+readme = """# hunterknewboldcc.com — refreshed site package
+
+This package is a Netlify-ready static site for a personal brand website built around a retro terminal / classified dossier aesthetic.
+
+## What was improved
+
+- stronger homepage positioning and calls to action
+- revised page titles and meta descriptions across core pages and blog posts
+- Open Graph, Twitter, canonical, and JSON-LD metadata
+- internal linking on published blog posts via Related Files sections
+- improved About, Portfolio, and Contact pages
+- Netlify-ready contact form with honeypot and thank-you page
+- SEO draft post placeholders marked `noindex` until expanded
+- updated sitemap for live pages only
+
+## Draft placeholder pages
+
+The following pages are included as structured drafts and are intentionally marked `noindex,follow` so they do not dilute SEO until they are fully written:
+
+- /blog/retro-terminal-design/
+- /blog/behavioral-science-in-design/
+- /blog/classified-dossier-visuals/
+- /blog/brutalist-design-principles/
+- /blog/signal-structure-design/
+- /blog/narrative-coherence-in-design/
+
+## Deploying
+
+1. Upload the site folder to Netlify, or drag the ZIP into a new manual deploy.
+2. Verify your public contact links and form settings before going live.
+3. Expand draft pages into full posts when ready, then remove the `noindex` directive.
+"""
+write(ROOT / 'README.md', readme)
+
+# sitemap excludes noindex drafts
+urls = [
+    '/', '/about/', '/portfolio/', '/contact/', '/thanks/', '/blog/'
+] + [post_url(slug) for slug in published_posts.keys()]
+
+sitemap = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+for u in urls:
+    sitemap.append('  <url>')
+    sitemap.append(f'    <loc>{full_url(u)}</loc>')
+    sitemap.append('    <changefreq>weekly</changefreq>')
+    sitemap.append('  </url>')
+sitemap.append('</urlset>')
+write(ROOT / 'sitemap.xml', '\n'.join(sitemap))
+
+# robots update
+write(ROOT / 'robots.txt', 'User-agent: *\nAllow: /\nSitemap: https://hunterknewboldcc.com/sitemap.xml\n')
+
+# zip it
+zip_path = '/mnt/data/hunterknewboldcc-brand-seo-refresh.zip'
+with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+    for file in sorted(ROOT.rglob('*')):
+        if file.name == 'refresh_site.py':
+            continue
+        if file.is_file():
+            zf.write(file, file.relative_to(ROOT))
+print(zip_path)

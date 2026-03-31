@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Components Gallery | Dossier Design System</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link href="https://cdn.jsdelivr.net/npm/@fontsource/ibm-plex-serif@5.0.8/index.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@fontsource/rajdhani@5.0.8/index.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@fontsource/share-tech-mono@5.0.8/index.css" rel="stylesheet" />
+    <style>
+        :root {
+            --primary: #c8a84b;
+            --primary-dim: color-mix(in oklab, var(--primary) 20%, transparent);
+            --border: rgba(200, 168, 75, 0.35);
+            --border-hard: rgba(200, 168, 75, 0.7);
+            --font-size: 15px;
+            --spacing: 4px;
+            --bg: #0a0a08;
+            --bg-paper: #0e0d0b;
+            --bg-card: #111109;
+            --text: #d4cfc4;
+            --text-dim: #7a7568;
+            --text-muted: #4a4840;
+            --red: #b03030;
+            --green: #3a5c3a;
+            --green-bright: #5a9c5a;
+            --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            --default-transition-duration: 200ms;
+            --shadow-hard: 4px 4px 0px 0px rgba(17, 17, 17, 1);
+            --shadow-soft: 0 20px 60px rgba(0, 0, 0, 0.28);
+            --max-width: 1120px;
+            --content-width: 760px;
+            --radius: 0px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            font-size: var(--font-size);
+            scroll-behavior: smooth;
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: "IBM Plex Serif", Georgia, serif;
+            line-height: 1.75;
+            min-height: 100vh;
+            overflow-x: hidden;
+            cursor: crosshair;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.32;
+        }
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.04) 2px,
+                rgba(0, 0, 0, 0.04) 4px
+            );
+            pointer-events: none;
+            z-index: 9997;
+        }
+        img {
+            max-width: 100%;
+            display: block;
+        }
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        a:hover {
+            color: #ede8dc;
+        }
+        p {
+            margin-bottom: calc(var(--spacing) * 6);
+        }
+        ul,
+        ol {
+            margin: 0 0 calc(var(--spacing) * 6) calc(var(--spacing) * 6);
+        }
+        li {
+            margin-bottom: calc(var(--spacing) * 2);
+        }
+        code {
+            font-family: "Share Tech Mono", monospace;
+            font-size: 0.9em;
+            color: var(--primary);
+            background: var(--bg-card);
+            padding: 1px 5px;
+            border: 1px solid var(--border);
+        }
+        strong {
+            color: #ede8dc;
+        }
+        em {
+            color: #ede8dc;
+        }
+        hr {
+            border: 0;
+            border-top: 1px solid var(--border);
+            margin: calc(var(--spacing) * 10) 0;
+        }
+        ::selection {
+            background: var(--primary-dim);
+            color: var(--primary);
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-hard);
+        }
+        .page-shell {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 calc(var(--spacing) * 6);
+        }
+        .content-shell {
+            max-width: var(--content-width);
+        }
+        .read-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 2px;
+            background: var(--primary);
+            width: 0%;
+            z-index: 10000;
+            transition: width 0.1s linear;
+        }
+        .site-header {
+            border-bottom: 1px solid var(--border);
+            padding: calc(var(--spacing) * 5) 0;
+            margin-bottom: calc(var(--spacing) * 10);
+            position: relative;
+        }
+        .site-header::before {
+            content: "▓▓▓ COMPONENTS GALLERY ▓▓▓ DESIGN SYSTEM v2.4 ▓▓▓";
+            font-family: "Share Tech Mono", monospace;
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 0.12em;
+            display: block;
+            margin-bottom: calc(var(--spacing) * 3);
+        }
+        .nav-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: calc(var(--spacing) * 4);
+        }
+        .nav-logo {
+            font-family: "Rajdhani", sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 0.25em;
+            color: var(--primary);
+            text-transform: uppercase;
+        }
+        .nav-links {
+            display: flex;
+            gap: calc(var(--spacing) * 6);
+            list-style: none;
+            margin: 0;
+        }
+        .nav-links a {
+            font-family: "Share Tech Mono", monospace;
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+        .nav-links a.active,
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        .hero-shell {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: calc(var(--spacing) * 10);
+            align-items: start;
+            margin-bottom: calc(var(--spacing) * 14);
+        }
+        .classification-banner {
+            display: flex;
+            align-items: center;
+            gap: calc(var(--spacing) * 3);
+            margin-bottom: calc(var(--spacing) * 8);
+            padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--primary);
+            background: var(--primary-dim);
+        }
+        .classification-badge {
+            font-family: "Rajdhani", sans-serif;
+            font-weight: 700;
+            font-size: 10px;
+            letter-spacing: 0.3em;
+            color: var(--primary);
+            padding: 2px 8px;
+            border: 1px solid var(--primary);
+            white-space: nowrap;
+            text-transform: uppercase;
+        }
+        .classification-meta {
+            font-family: "Share Tech Mono", monospace;
+            font-size: 9px;
+            color: var(--text-dim);
+            letter-spacing: 0.1em;
+            flex: 1;
+        }
+        .kicker {
+            font-family: "Share Tech Mono", monospace;
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 0.15em;
+            margin-bottom: calc(var(--spacing) * 4);
+            display: flex;
+            align-items: center;
+            gap: calc(var(--spacing) * 3);
+        }
+        .kicker::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+        .page-title {
+            font-family: "Rajdhani", sans-serif;
+            font-weight: 700;
+            font-size: clamp(2rem, 5vw, 3.4rem);
+            line-height: 1.05;
+            letter-spacing: 0.02em;
+            color: #ede8dc;
+            margin-bottom: calc(var(--spacing) * 5);
+            text-transform: uppercase;
+        }
+        .page-title em {
+            font-style: normal;
+            color: var(--primary);
+        }
+        .lede {
+            font-size: 1.12rem;
+            line-height: 1.75;
+            color: var(--text);
+            border-left: 2px solid var(--primary);
+            padding-left: calc(var(--spacing) * 5);
+            margin-bottom: calc(var(--spacing) * 8);
+            font-style: italic;
+        }
+        .hero-card,
+        .panel,
+        .card,
+        .callout,
+        .meta-card {
+            border: 1px solid var(--border);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.015), rgba(255, 255, 255, 0)), var(--bg-card);
+            box-shadow: var(--shadow-hard);
+        }
+        .hero-card {
+            min-height: 320px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(rgba(200, 168, 75, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(200, 168, 75, 0.05) 1px, transparent 1px);
+            background-size: 36px 36px;
+        }
+        .hero-card img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.4;
+        }
+        .hero-label {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: calc(var(--spacing) * 3) calc(var(--spacing) * 4);
+            background: linear-gradient(transparent, rgba(10, 10, 8, 0.92));
+            display: flex;
+            justify-content: space-between;
+            gap: calc(var(--spacing) * 3);
+            font-family: "Share Tech Mono", monospace;
+            font-size: 9px;
+            letter-spacing: 0.15em;
+            color: var(--primary);
+            z-index: 3;
+        }
+        .grid-2,
+        .grid-3,
+        .grid-4 {
+            display: grid;
+            gap: calc(var(--spacing) * 6);
+        }
+        .grid-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .grid-3 {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        .grid-4 {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+        .card {
+            padding: calc(var(--spacing) * 5);
+            position: relative;
+        }
+        .card h3 {
+            font-family: "Rajdhani", sans-serif;
+            font-size: 1.15rem;
+            letter-spacing: 0.08em;
+            margin-bottom: calc(var(--spacing) * 3);
+            text-transform: uppercase;
+            color: #ede8dc;
+        }
+        .card-meta,
+        .small-label {
+            font-family: "Share Tech Mono", monospace;
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            margin-bottom: calc(var(--spacing) * 3);
+        }
+        .card p:last-child {
+            margin-bottom: 0;
+        }
+        .card-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: calc(var(--spacing) * 2);
+            font-family: "Share Tech Mono", monospace;
+            font-size: 10px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+        .section-title {
+            font-family: "Rajdhani", sans-serif;
+            font-size: 1.45rem;
+            letter-spacing: 0.12em;
+            color: #ede8dc;
+            text-transform: uppercase;
+            margin-bottom: calc(var(--spacing) * 5);
+            display: flex;
+            align-items: center;
+            gap: calc(var(--spacing) * 3);
+        }
+        .section-title::before {
+            content: '//';
+            font-family: "Share Tech Mono", monospace;
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 400;
+        }
+        .section-copy {
+            max-width: var(--content-width);
+        }
+        .post-body {
+            max-width: var(--content-width);
+        }
+        .post-body h2 {
+            font-family: "Rajdhani", sans-serif;
+            font-weight: 700;
+            font-size: 1.35rem;
+            letter-spacing: 0.12em;
+            color: #ede8dc;
+            text-transform: uppercase;
+            margin: calc(var(--spacing) * 12) 0 calc(var(--spacing) * 5);
+            padding-bottom: calc(var(--spacing) * 3);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: calc(var(--spacing) * 3);
+        }
+        .post-body h2::before {
+            content: '//';
+            font-family: "Share Tech Mono", monospace;
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 400;
+        }
+        .post-body blockquote,
+        .pullquote {
+            font-family: "Rajdhani", sans-serif;
+            font-weight: 600;
+            font-size: 1.45rem;
+            line-height: 1.3;
+            color: #ede8dc;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            border-top: 2px solid var(--primary);
+            border-bottom: 1px solid var(--border);
+            padding: calc(var(--spacing) * 6) 0;
+            margin: calc(var(--spacing) * 10) 0;
+            text-align: center;
+            position: relative;
+        }
+        .post-body blockquote::before,
+        .pullquote::before {
+            content: '"';
+            position: absolute;
+            top: -1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+            color: var(--primary);
+            line-height: 1;
+            background: var(--bg);
+            padding: 0 calc(var(--spacing) * 2);
+        }
+        .callout {
+            padding: calc(var(--spacing) * 5) calc(var(--spacing) * 6);
+            margin: calc(var(--spacing) * 8) 0;
+            border-left: 3px solid var(--primary);
+        }
+        .callout::before {
+            content: attr(data-label);
+            font-family: "Share Tech Mono", monospace;
+            font-size: 9px;
+            letter-spacing: 0.2em;
+            color: var(--primary);
+            display: block;
+            margin-bottom: calc(var(--spacing) * 3);
+            text-transform: uppercase;
+        }
+        .token-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: "Share Tech Mono", monospace;
+            font-size: 10px;
+            margin: calc(var(--spacing) * 6) 0;
+            border: 1px solid var(--border);
+        }
+        .token-table th {
+            background: var(--bg-card);
+            color: var(--primary);
+            text-align: left;
+            padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+            letter-spacing: 0.15em;
+            border-bottom: 1px solid var(--border-hard);
+            font-size: 9px;
+            text-transform: uppercase;
+        }
+        .token-table td {
+            padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+            vertical-align: top;
+        }
+        .token-table td:first-child {
+            color: var(--primary);
+            white-space: nowrap;
+        }
+        .token-table tr:last-child td {
+            border-bottom: none;
+        }
+        .meta-card {
+            padding: calc(var(--spacing) * 6);
+            margin-top: calc(var(--spacing) * 14);
+            margin-bottom: calc(var(--spacing) * 8);
+        }
+        .meta-card-label {
+            font-family: "Share Tech Mono", monospace;
+            font-size: 9px;
+            letter-spacing: 0.2em;
+            color: var(--primary);
+            margin-bottom: calc(var(--spacing) * 4);
+            padding-bottom: calc(var(--spacing) * 3);
+            border-bottom: 1px solid var(--border);
+            text-transform: uppercase;
+        }
+        .meta-row {
+            display: flex;
+            gap: calc(var(--spacing) * 4);
+            margin-bottom: calc(var(--spacing) * 3);
+            align-items: baseline;
+            font-family: "Share Tech Mono", monospace;
+            font-size: 10px;
+        }
+        .meta-key {
+            color: var(--text-dim);
+            letter-spacing: 0.1em;
+            min-width: 130px;
+            flex-shrink: 0;
+            text-transform: uppercase;
+        }
+        .meta-val {
+            color: var(--text);
+        }
+        .site-footer {
+            border-top: 1px solid var(--border);
+            padding: calc(var(--spacing) * 6) 0;
+            margin-top: calc(var(--spacing) * 12);
+        }
+        .footer-row {
+            display: flex;
+            justify-content: space-between;
+            gap: calc(var(--spacing) * 6);
+            align-items: center;
+        }
+        .footer-copy,
+        .footer-status {
+            font-family: "Share Tech Mono", monospace;
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .footer-status {
+            color: var(--green-bright);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--green-bright);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: calc(var(--spacing) * 2);
+            margin-top: calc(var(--spacing) * 4);
+        }
+        .tag {
+            font-family: "Share Tech Mono", monospace;
+            font-size: 9px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+            padding: 4px 7px;
+        }
+        .button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-family: "Share Tech Mono", monospace;
+            font-size: 10px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            background: transparent;
+            transition: all var(--default-transition-duration) var(--default-transition-timing-function);
+        }
+        .button:hover {
+            background: var(--primary-dim);
+        }
+        .button-primary {
+            background: var(--primary);
+            color: var(--bg);
+        }
+        .button-primary:hover {
+            background: var(--primary-dim);
+            color: var(--primary);
+        }
+        .form-grid {
+            display: grid;
+            gap: calc(var(--spacing) * 4);
+        }
+        input,
+        textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.01);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 12px 14px;
+            font: inherit;
+            transition: border-color var(--default-transition-duration) var(--default-transition-timing-function);
+        }
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        textarea {
+            min-height: 180px;
+            resize: vertical;
+        }
+        .post-list {
+            display: grid;
+            gap: calc(var(--spacing) * 5);
+        }
+        .post-list .card:hover,
+        .card:hover {
+            transform: translateY(-2px);
+            transition: transform var(--default-transition-duration) var(--default-transition-timing-function);
+        }
+        .muted {
+            color: var(--text-dim);
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+        @media (max-width: 900px) {
+            .hero-shell {
+                grid-template-columns: 1fr;
+            }
+            .grid-4 {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .grid-3 {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+        @media (max-width: 680px) {
+            .page-shell {
+                padding: 0 calc(var(--spacing) * 4);
+            }
+            .nav-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .nav-links {
+                flex-wrap: wrap;
+                gap: calc(var(--spacing) * 3);
+            }
+            .grid-2,
+            .grid-3,
+            .grid-4 {
+                grid-template-columns: 1fr;
+            }
+            .meta-row {
+                flex-direction: column;
+                gap: 6px;
+            }
+        }
+        .footer-copy a {
+            color: var(--text-dim);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+        }
+        .footer-copy a:hover,
+        .footer-copy a:focus-visible {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        /* Gallery Specific Styles */
+        .gallery-nav {
+            position: sticky;
+            top: calc(var(--spacing) * 2);
+            z-index: 100;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: calc(var(--spacing) * 3);
+            margin-bottom: calc(var(--spacing) * 8);
+        }
+        .gallery-nav ul {
+            display: flex;
+            flex-wrap: wrap;
+            gap: calc(var(--spacing) * 3);
+            list-style: none;
+            margin: 0;
+        }
+        .gallery-nav a {
+            font-family: "Share Tech Mono", monospace;
+            font-size: 9px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+            border: 1px solid transparent;
+        }
+        .gallery-nav a:hover,
+        .gallery-nav a.active {
+            color: var(--primary);
+            border-color: var(--border);
+        }
+        .component-demo {
+            border: 1px dashed var(--border);
+            padding: calc(var(--spacing) * 6);
+            margin-bottom: calc(var(--spacing) * 4);
+            background: rgba(255, 255, 255, 0.005);
+        }
+        .component-demo-label {
+            font-family: "Share Tech Mono", monospace;
+            font-size: 8px;
+            letter-spacing: 0.2em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: calc(var(--spacing) * 3);
+        }
+        .color-swatch {
+            width: 100%;
+            height: 80px;
+            border: 1px solid var(--border);
+            margin-bottom: calc(var(--spacing) * 2);
+        }
+        .color-info {
+            font-family: "Share Tech Mono", monospace;
+            font-size: 9px;
+            color: var(--text-dim);
+            letter-spacing: 0.1em;
+        }
+        .component-section {
+            scroll-margin-top: calc(var(--spacing) * 20);
+        }
+        .copy-code {
+            font-family: "Share Tech Mono", monospace;
+            font-size: 9px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: calc(var(--spacing) * 3);
+            margin-top: calc(var(--spacing) * 3);
+            color: var(--text-dim);
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="read-progress" id="readProgress"></div>
+    
+    <header class="site-header">
+        <div class="page-shell">
+            <div class="nav-row">
+                <a href="#" class="nav-logo">Dossier<span style="color:var(--text-dim)">.ui</span></a>
+                <nav>
+                    <ul class="nav-links">
+                        <li><a href="#" class="active">Components</a></li>
+                        <li><a href="#">Tokens</a></li>
+                        <li><a href="#">Layouts</a></li>
+                        <li><a href="#">Documentation</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-shell">
+        <section class="hero-shell">
+            <div>
+                <div class="classification-banner">
+                    <span class="classification-badge">Public</span>
+                    <span class="classification-meta">Design System Components v2.4.1 // Last Updated: 2024</span>
+                </div>
+                <div class="kicker">Component Library</div>
+                <h1 class="page-title">Components <em>Gallery</em></h1>
+                <p class="lede">A comprehensive collection of reusable UI components built on the Dossier design system. Each component follows strict accessibility guidelines and maintains visual consistency across all implementations.</p>
+                <div class="tag-list">
+                    <span class="tag">HTML5</span>
+                    <span class="tag">CSS3</span>
+                    <span class="tag">Vanilla JS</span>
+                    <span class="tag">Accessible</span>
+                    <span class="tag">Responsive</span>
+                </div>
+            </div>
+            <div class="hero-card">
+                <img src="https://image.qwenlm.ai/public_source/04e62066-2076-4aa5-a777-45ca77b2937c/1b3f50847-94e6-4416-aff3-afc83ab8e6e3.png" alt="Technical grid background" />
+                <div class="hero-label">
+                    <span>FIG.01 — COMPONENT PREVIEW</span>
+                    <span>RENDER: ACTIVE</span>
+                </div>
+            </div>
+        </section>
+
+        <nav class="gallery-nav">
+            <ul>
+                <li><a href="#buttons">Buttons</a></li>
+                <li><a href="#cards">Cards</a></li>
+                <li><a href="#forms">Forms</a></li>
+                <li><a href="#typography">Typography</a></li>
+                <li><a href="#navigation">Navigation</a></li>
+                <li><a href="#badges">Badges</a></li>
+                <li><a href="#tables">Tables</a></li>
+                <li><a href="#colors">Colors</a></li>
+            </ul>
+        </nav>
+
+        <section id="buttons" class="component-section">
+            <h2 class="section-title">Button Components</h2>
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-meta">Default State</div>
+                    <div class="component-demo">
+                        <button class="button">Default Button</button>
+                    </div>
+                    <div class="copy-code">.button</div>
+                </div>
+                <div class="card">
+                    <div class="card-meta">Primary Variant</div>
+                    <div class="component-demo">
+                        <button class="button button-primary">Primary Action</button>
+                    </div>
+                    <div class="copy-code">.button.button-primary</div>
+                </div>
+                <div class="card">
+                    <div class="card-meta">With Icon</div>
+                    <div class="component-demo">
+                        <button class="button">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7" />
+                            </svg>
+                            Navigate
+                        </button>
+                    </div>
+                    <div class="copy-code">.button + SVG icon</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="cards" class="component-section">
+            <h2 class="section-title">Card Components</h2>
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-meta">Standard Card</div>
+                    <h3>Card Title</h3>
+                    <p class="muted">Card content goes here with proper spacing and typography hierarchy.</p>
+                    <a href="#" class="card-link">
+                        Learn More
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                </div>
+                <div class="card">
+                    <div class="card-meta">With Meta</div>
+                    <div class="card-meta">META INFORMATION</div>
+                    <h3>Meta Card</h3>
+                    <p>Includes additional metadata display above the main content area.</p>
+                </div>
+                <div class="card">
+                    <div class="card-meta">Interactive</div>
+                    <h3>Hover Effect</h3>
+                    <p>Cards feature a subtle translateY animation on hover state.</p>
+                    <div class="tag-list">
+                        <span class="tag">Tag One</span>
+                        <span class="tag">Tag Two</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="forms" class="component-section">
+            <h2 class="section-title">Form Components</h2>
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Input Fields</h3>
+                    <div class="component-demo">
+                        <div class="form-grid">
+                            <div>
+                                <label class="small-label">Text Input</label>
+                                <input type="text" placeholder="Enter text..." />
+                            </div>
+                            <div>
+                                <label class="small-label">Email Input</label>
+                                <input type="email" placeholder="email@example.com" />
+                            </div>
+                            <div>
+                                <label class="small-label">Text Area</label>
+                                <textarea placeholder="Enter message..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="copy-code">input, textarea</div>
+                </div>
+                <div class="card">
+                    <h3>Form Layout</h3>
+                    <div class="component-demo">
+                        <div class="form-grid">
+                            <div class="grid-2">
+                                <input type="text" placeholder="First Name" />
+                                <input type="text" placeholder="Last Name" />
+                            </div>
+                            <input type="text" placeholder="Subject" />
+                            <textarea placeholder="Your message..."></textarea>
+                            <button class="button button-primary">Submit Form</button>
+                        </div>
+                    </div>
+                    <div class="copy-code">.form-grid</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="typography" class="component-section">
+            <h2 class="section-title">Typography</h2>
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Headings</h3>
+                    <div class="component-demo">
+                        <h1 class="page-title" style="font-size:2rem">Heading 1</h1>
+                        <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.35rem;letter-spacing:0.12em;text-transform:uppercase;color:#ede8dc;margin:calc(var(--spacing)*6) 0">Heading 2</h2>
+                        <h3 style="font-family:'Rajdhani',sans-serif;font-size:1.15rem;letter-spacing:0.08em;text-transform:uppercase;color:#ede8dc">Heading 3</h3>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Body Text</h3>
+                    <div class="component-demo">
+                        <p>Standard body text uses IBM Plex Serif with 1.75 line height for optimal readability.</p>
+                        <p class="muted">Muted text uses the --text-dim color variable for secondary information.</p>
+                        <p><strong>Strong text</strong> and <em>emphasized text</em> use the #ede8dc color for contrast.</p>
+                        <p><code>Inline code</code> uses Share Tech Mono with border styling.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card" style="margin-top:calc(var(--spacing)*6)">
+                <h3>Blockquote</h3>
+                <blockquote>Design is not just what it looks like and feels like. Design is how it works.</blockquote>
+            </div>
+        </section>
+
+        <section id="navigation" class="component-section">
+            <h2 class="section-title">Navigation</h2>
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Primary Nav</h3>
+                    <div class="component-demo">
+                        <nav>
+                            <ul class="nav-links" style="flex-wrap:wrap">
+                                <li><a href="#" class="active">Home</a></li>
+                                <li><a href="#">About</a></li>
+                                <li><a href="#">Work</a></li>
+                                <li><a href="#">Contact</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                    <div class="copy-code">.nav-links</div>
+                </div>
+                <div class="card">
+                    <h3>Breadcrumb Style</h3>
+                    <div class="component-demo">
+                        <div class="kicker">Home / Components / Gallery</div>
+                    </div>
+                    <div class="copy-code">.kicker</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="badges" class="component-section">
+            <h2 class="section-title">Badges & Tags</h2>
+            <div class="grid-3">
+                <div class="card">
+                    <h3>Classification</h3>
+                    <div class="component-demo">
+                        <div class="classification-banner">
+                            <span class="classification-badge">Public</span>
+                            <span class="classification-meta">Document classification metadata</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Tags</h3>
+                    <div class="component-demo">
+                        <div class="tag-list">
+                            <span class="tag">Design</span>
+                            <span class="tag">Development</span>
+                            <span class="tag">UI/UX</span>
+                            <span class="tag">System</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Status</h3>
+                    <div class="component-demo">
+                        <div class="footer-status">
+                            <span class="status-dot"></span>
+                            System Online
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tables" class="component-section">
+            <h2 class="section-title">Data Tables</h2>
+            <div class="card">
+                <h3>Token Table</h3>
+                <table class="token-table">
+                    <thead>
+                        <tr>
+                            <th>Token</th>
+                            <th>Value</th>
+                            <th>Usage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>--primary</td>
+                            <td>#c8a84b</td>
+                            <td>Primary actions, links, accents</td>
+                        </tr>
+                        <tr>
+                            <td>--bg</td>
+                            <td>#0a0a08</td>
+                            <td>Main background color</td>
+                        </tr>
+                        <tr>
+                            <td>--text</td>
+                            <td>#d4cfc4</td>
+                            <td>Primary text color</td>
+                        </tr>
+                        <tr>
+                            <td>--border</td>
+                            <td>rgba(200,168,75,0.35)</td>
+                            <td>Border and divider elements</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="copy-code">.token-table</div>
+            </div>
+        </section>
+
+        <section id="colors" class="component-section">
+            <h2 class="section-title">Color Palette</h2>
+            <div class="grid-4">
+                <div class="card">
+                    <div class="color-swatch" style="background:#c8a84b"></div>
+                    <div class="color-info">Primary<br>#c8a84b</div>
+                </div>
+                <div class="card">
+                    <div class="color-swatch" style="background:#0a0a08"></div>
+                    <div class="color-info">Background<br>#0a0a08</div>
+                </div>
+                <div class="card">
+                    <div class="color-swatch" style="background:#111109"></div>
+                    <div class="color-info">Card BG<br>#111109</div>
+                </div>
+                <div class="card">
+                    <div class="color-swatch" style="background:#d4cfc4"></div>
+                    <div class="color-info">Text<br>#d4cfc4</div>
+                </div>
+                <div class="card">
+                    <div class="color-swatch" style="background:#7a7568"></div>
+                    <div class="color-info">Text Dim<br>#7a7568</div>
+                </div>
+                <div class="card">
+                    <div class="color-swatch" style="background:#4a4840"></div>
+                    <div class="color-info">Text Muted<br>#4a4840</div>
+                </div>
+                <div class="card">
+                    <div class="color-swatch" style="background:#b03030"></div>
+                    <div class="color-info">Red<br>#b03030</div>
+                </div>
+                <div class="card">
+                    <div class="color-swatch" style="background:#5a9c5a"></div>
+                    <div class="color-info">Green<br>#5a9c5a</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="meta-card">
+            <div class="meta-card-label">System Information</div>
+            <div class="meta-row">
+                <span class="meta-key">Version</span>
+                <span class="meta-val">2.4.1</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-key">Last Updated</span>
+                <span class="meta-val">2024-01-15</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-key">Components</span>
+                <span class="meta-val">47 Active</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-key">Status</span>
+                <span class="meta-val" style="color:var(--green-bright)">Production Ready</span>
+            </div>
+        </div>
+
+        <div class="callout" data-label="Note">
+            <p>All components are built with accessibility in mind. Ensure proper ARIA labels are added when implementing in production environments. Keyboard navigation is supported across all interactive elements.</p>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="page-shell">
+            <div class="footer-row">
+                <div class="footer-copy">
+                    © 2024 Dossier Design System. <a href="#">License</a> · <a href="#">Documentation</a>
+                </div>
+                <div class="footer-status">
+                    <span class="status-dot"></span>
+                    All Systems Operational
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Read Progress Indicator
+        const readProgress = document.getElementById('readProgress');
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollTop / docHeight) * 100;
+            readProgress.style.width = progress + '%';
+        });
+
+        // Smooth scroll for gallery navigation
+        document.querySelectorAll('.gallery-nav a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href');
+                const target = document.querySelector(targetId);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                    // Update active state
+                    document.querySelectorAll('.gallery-nav a').forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Card hover effect enhancement
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transition = 'transform 200ms cubic-bezier(0.4, 0, 0.2, 1)';
+            });
+        });
+
+        // Form input focus effects
+        document.querySelectorAll('input, textarea').forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.style.borderColor = 'var(--primary)';
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.style.borderColor = 'var(--border)';
+            });
+        });
+    </script>
+</body>
+</html>
